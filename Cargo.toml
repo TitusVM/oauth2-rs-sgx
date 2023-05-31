@@ -8,42 +8,43 @@ repository = "https://github.com/ramosbugs/oauth2-rs"
 edition = "2018"
 readme = "README.md"
 
-[package.metadata.docs.rs]
-all-features = true
+# [package.metadata.docs.rs]
+# all-features = true
 
 [badges]
 maintenance = { status = "actively-developed" }
 
-[features]
-default = ["reqwest", "rustls-tls"]
-pkce-plain = []
-native-tls = ["reqwest/native-tls"]
-rustls-tls = ["reqwest/rustls-tls"]
+# [features]
+# default = ["reqwest", "rustls-tls"]
+# pkce-plain = []
+# native-tls = ["reqwest/native-tls"]
+# rustls-tls = ["reqwest/rustls-tls"]
 
 [dependencies]
-base64 = "0.13"
-thiserror = "1.0"
-http = "0.2"
-rand = "0.8"
-reqwest = { version = "0.11", optional = true, default-features = false, features = ["blocking"] }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-sha2 = "0.10"
-ureq = { version = "2", optional = true }
-url = { version = "2.1", features = ["serde"] }
-chrono = { version = "0.4", default-features = false, features = ["clock", "serde", "std"] }
-serde_path_to_error = "0.1.2"
+base64 = { git = "https://github.com/mesalock-linux/rust-base64-sgx.git"}
+thiserror = { git = "https://github.com/mesalock-linux/thiserror-sgx.git"}
+http = { git = "https://github.com/mesalock-linux/http-sgx.git"}
+rand = { git = "https://github.com/mesalock-linux/rand-sgx.git"}
+serde = { git = "https://github.com/mesalock-linux/serde-sgx.git"}
+serde_json = { git = "https://github.com/mesalock-linux/serde-json-sgx.git"}
+url = { git = "https://github.com/mesalock-linux/rust-url-sgx.git" }
+chrono = { git = "https://github.com/mesalock-linux/chrono-sgx.git" }
 
-[target.'cfg(target_arch = "wasm32")'.dependencies]
-getrandom = { version = "0.2", features = ["js"] }
+# sha2 = "0.10"
+# reqwest = { version = "0.11", optional = true, default-features = false, features = ["blocking"] }
+# ureq = { version = "2", optional = true }
+# serde_path_to_error = "0.1.2"
 
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-curl = { version = "0.4.0", optional = true }
+# [target.'cfg(target_arch = "wasm32")'.dependencies]
+# getrandom = { version = "0.2", features = ["js"] }
 
-[dev-dependencies]
-hex = "0.4"
-hmac = "0.12"
-uuid = { version = "0.8", features = ["v4"] }
-anyhow = "1.0"
-tokio = { version = "1.0", features = ["full"] }
-async-std = "1.6.3"
+# [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+# curl = { version = "0.4.0", optional = true }
+
+# [dev-dependencies]
+# hex = "0.4"
+# hmac = "0.12"
+# uuid = { version = "0.8", features = ["v4"] }
+# anyhow = "1.0"
+# tokio = { version = "1.0", features = ["full"] }
+# async-std = "1.6.3"
