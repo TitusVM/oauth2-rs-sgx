@@ -418,8 +418,18 @@
 //!
 //! - [`actix-web-oauth2`](https://github.com/pka/actix-web-oauth2) (version 2.x of this crate)
 //!
+
+#![no_std]
+extern crate sgx_tstd as std;
+
 use chrono::serde::ts_seconds_option;
 use chrono::{DateTime, Utc};
+
+
+use std::prelude::rust_2024::*;
+use std::string::{String, ToString};
+use std::{vec, format};
+
 use std::borrow::Cow;
 use std::error::Error;
 use std::fmt::Error as FormatterError;
@@ -432,8 +442,12 @@ use std::time::Duration;
 use http::header::{HeaderMap, HeaderValue, ACCEPT, AUTHORIZATION, CONTENT_TYPE};
 use http::status::StatusCode;
 use serde::de::DeserializeOwned;
-use serde::{Deserialize, Serialize};
+use serde_derive::{Deserialize, Serialize};
+use serde::Serialize;
 use url::{form_urlencoded, Url};
+
+mod tests;
+use tests::mock_time_fn;
 
 ///
 /// Basic OAuth2 implementation with no extensions
@@ -479,8 +493,8 @@ pub mod helpers;
 #[cfg(feature = "reqwest")]
 pub mod reqwest;
 
-#[cfg(test)]
-mod tests;
+//#[cfg(test)]
+//mod tests; // always active because we require the mock_time function on the enclave
 
 mod types;
 
@@ -624,6 +638,7 @@ where
     device_authorization_url: Option<DeviceAuthorizationUrl>,
     phantom: PhantomData<(TE, TR, TT, TIR, RT, TRE)>,
 }
+
 
 impl<TE, TR, TT, TIR, RT, TRE> Client<TE, TR, TT, TIR, RT, TRE>
 where
@@ -881,6 +896,7 @@ where
     /// Perform a device access token request as per
     /// <https://tools.ietf.org/html/rfc8628#section-3.4>.
     ///
+    /// 
     pub fn exchange_device_access_token<'a, 'b, 'c, EF>(
         &'a self,
         auth_response: &'b DeviceAuthorizationResponse<EF>,
@@ -896,7 +912,7 @@ where
             extra_params: Vec::new(),
             token_url: self.token_url.as_ref(),
             dev_auth_resp: auth_response,
-            time_fn: Arc::new(Utc::now),
+            time_fn: Arc::new(mock_time_fn()),
             max_backoff_interval: None,
             _phantom: PhantomData,
         }
@@ -2046,9 +2062,10 @@ where
     check_response_body(&http_response)?;
 
     let response_body = http_response.body.as_slice();
-    serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_slice(response_body))
-        .map_err(|e| RequestTokenError::Parse(e, response_body.to_vec()))
+    serde_json::from_slice(response_body)
+        .map_err(|e| RequestTokenError::Parse(e.into(), response_body.to_vec()))
 }
+
 
 fn endpoint_response_status_only<RE, TE>(
     http_response: HttpResponse,
@@ -2074,11 +2091,9 @@ where
                 "Server returned empty error response".to_string(),
             ));
         } else {
-            let error = match serde_path_to_error::deserialize::<_, TE>(
-                &mut serde_json::Deserializer::from_slice(reason),
-            ) {
+            let error = match serde_json::from_slice::<TE>(reason) {
                 Ok(error) => RequestTokenError::ServerResponse(error),
-                Err(error) => RequestTokenError::Parse(error, reason.to_vec()),
+                Err(error) => RequestTokenError::Parse(error.into(), reason.to_vec()),
             };
             return Err(error);
         }
@@ -3164,30 +3179,19 @@ where
     RE: Error + 'static,
     T: ErrorResponse + 'static,
 {
-    ///
-    /// Error response returned by authorization server. Contains the parsed `ErrorResponse`
-    /// returned by the server.
-    ///
     #[error("Server returned error response")]
     ServerResponse(T),
-    ///
-    /// An error occurred while sending the request or receiving the response (e.g., network
-    /// connectivity failed).
-    ///
+
     #[error("Request failed")]
     Request(#[source] RE),
-    ///
-    /// Failed to parse server response. Parse errors may occur while parsing either successful
-    /// or error responses.
-    ///
+
     #[error("Failed to parse server response")]
     Parse(
-        #[source] serde_path_to_error::Error<serde_json::error::Error>,
+        #[source] serde_json::error::Error,
         Vec<u8>,
     ),
-    ///
-    /// Some other type of error occurred (e.g., an unexpected server response).
-    ///
+
     #[error("Other error: {}", _0)]
     Other(String),
 }
+

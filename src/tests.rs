@@ -5,6 +5,10 @@ use thiserror::Error;
 use url::form_urlencoded::byte_serialize;
 use url::Url;
 
+use std::prelude::rust_2024::*;
+// We replaced Mutex with the custom sgx Mutex type.
+use std::sync::SgxMutex;
+
 use crate::revocation::StandardRevocableToken;
 
 use super::basic::*;
@@ -2087,8 +2091,9 @@ impl IncreasingTime {
 }
 
 /// Creates a time function that increments by one second each time.
-fn mock_time_fn() -> impl Fn() -> DateTime<Utc> + Send + Sync {
-    let timer = std::sync::Mutex::new(IncreasingTime::new());
+
+pub fn mock_time_fn() -> impl Fn() -> DateTime<Utc> + Send + Sync {
+    let timer = SgxMutex::new(IncreasingTime::new());
     move || timer.lock().unwrap().next()
 }
 
@@ -2339,7 +2344,7 @@ fn mock_http_client_success_fail(
         .take(num_failures)
         .chain(std::iter::once(success_response))
         .collect();
-    let sync_responses = std::sync::Mutex::new(responses);
+    let sync_responses = SgxMutex::new(responses);
 
     move |request: HttpRequest| {
         assert_eq!(

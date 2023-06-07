@@ -1,3 +1,4 @@
+use std::prelude::rust_2024::*;
 use std::fmt::Error as FormatterError;
 use std::fmt::{Debug, Display, Formatter};
 

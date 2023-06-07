@@ -1,6 +1,8 @@
 use serde::ser::{Impossible, SerializeStructVariant, SerializeTupleVariant};
 use serde::{de, ser};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use std::prelude::rust_2024::*;
+use std::vec;
 use std::fmt;
 use std::marker::PhantomData;
 

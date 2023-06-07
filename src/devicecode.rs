@@ -1,3 +1,4 @@
+use std::prelude::rust_2024::*;
 use std::error::Error;
 use std::fmt::Error as FormatterError;
 use std::fmt::{Debug, Display, Formatter};
@@ -5,7 +6,8 @@ use std::marker::PhantomData;
 use std::time::Duration;
 
 use serde::de::DeserializeOwned;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
+use serde_derive::{Deserialize, Serialize};
 
 use super::{
     DeviceCode, EndUserVerificationUrl, ErrorResponse, ErrorResponseType, RequestTokenError,
