@@ -6,7 +6,7 @@ use std::marker::PhantomData;
 use std::time::Duration;
 
 use serde::de::DeserializeOwned;
-use serde::Serialize;
+//use serde::Serialize;
 use serde_derive::{Deserialize, Serialize};
 
 use super::{
@@ -26,7 +26,7 @@ fn default_devicecode_interval() -> u64 {
 ///
 /// Trait for adding extra fields to the `DeviceAuthorizationResponse`.
 ///
-pub trait ExtraDeviceAuthorizationFields: DeserializeOwned + Debug + Serialize {}
+pub trait ExtraDeviceAuthorizationFields: DeserializeOwned + Debug + serde::Serialize {}
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 ///

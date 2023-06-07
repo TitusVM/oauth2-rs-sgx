@@ -443,7 +443,6 @@ use http::header::{HeaderMap, HeaderValue, ACCEPT, AUTHORIZATION, CONTENT_TYPE};
 use http::status::StatusCode;
 use serde::de::DeserializeOwned;
 use serde_derive::{Deserialize, Serialize};
-use serde::Serialize;
 use url::{form_urlencoded, Url};
 
 mod tests;
@@ -2530,12 +2529,12 @@ where
 ///
 /// Trait for OAuth2 access tokens.
 ///
-pub trait TokenType: Clone + DeserializeOwned + Debug + PartialEq + Serialize {}
+pub trait TokenType: Clone + DeserializeOwned + Debug + PartialEq + serde::Serialize {}
 
 ///
 /// Trait for adding extra fields to the `TokenResponse`.
 ///
-pub trait ExtraTokenFields: DeserializeOwned + Debug + Serialize {}
+pub trait ExtraTokenFields: DeserializeOwned + Debug + serde::Serialize {}
 
 ///
 /// Empty (default) extra token fields.
@@ -2552,7 +2551,7 @@ impl ExtraTokenFields for EmptyExtraTokenFields {}
 /// separately from the `StandardTokenResponse` struct to support customization by clients,
 /// such as supporting interoperability with non-standards-complaint OAuth2 providers.
 ///
-pub trait TokenResponse<TT>: Debug + DeserializeOwned + Serialize
+pub trait TokenResponse<TT>: Debug + DeserializeOwned + serde::Serialize
 where
     TT: TokenType,
 {
@@ -2745,7 +2744,7 @@ where
 /// separately from the `StandardTokenIntrospectionResponse` struct to support customization by
 /// clients, such as supporting interoperability with non-standards-complaint OAuth2 providers.
 ///
-pub trait TokenIntrospectionResponse<TT>: Debug + DeserializeOwned + Serialize
+pub trait TokenIntrospectionResponse<TT>: Debug + DeserializeOwned + serde::Serialize
 where
     TT: TokenType,
 {
@@ -3065,7 +3064,7 @@ where
 /// to support customization by clients, such as supporting interoperability with
 /// non-standards-complaint OAuth2 providers
 ///
-pub trait ErrorResponse: Debug + DeserializeOwned + Serialize {}
+pub trait ErrorResponse: Debug + DeserializeOwned + serde::Serialize {}
 
 ///
 /// Error types enum.
@@ -3074,7 +3073,7 @@ pub trait ErrorResponse: Debug + DeserializeOwned + Serialize {}
 /// this error type. This value must match the error type from the relevant OAuth 2.0 standards
 /// (RFC 6749 or an extension).
 ///
-pub trait ErrorResponseType: Debug + DeserializeOwned + Serialize {}
+pub trait ErrorResponseType: Debug + DeserializeOwned + serde::Serialize {}
 
 ///
 /// Error response returned by server after requesting an access token.
