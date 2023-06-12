@@ -6,7 +6,7 @@ use std::ops::Deref;
 
 use rand::{thread_rng, Rng};
 use serde_derive::{Deserialize, Serialize};
-use sha1::{Sha1};
+use sha2::{Digest, Sha256};
 use url::Url;
 
 macro_rules! new_type {
@@ -501,8 +501,8 @@ impl PkceCodeChallenge {
         // characters and a maximum length of 128 characters".
         assert!(code_verifier.secret().len() >= 43 && code_verifier.secret().len() <= 128);
         
-        let digest = Sha1::digest(&Sha1::from(code_verifier.secret().as_bytes()));
-        let code_challenge = base64::encode_config(digest.to_string(), base64::URL_SAFE_NO_PAD);
+        let digest = Sha256::digest(code_verifier.secret().as_bytes());
+        let code_challenge = base64::encode_config(&digest, base64::URL_SAFE_NO_PAD);
 
         Self {
             code_challenge,
